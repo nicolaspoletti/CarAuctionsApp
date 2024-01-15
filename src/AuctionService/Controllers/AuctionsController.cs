@@ -9,6 +9,7 @@ using AuctionService.Data;
 using AuctionService.Entities;
 using AuctionService.DTOs;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace AuctionService.Controllers
 {
@@ -27,19 +28,16 @@ namespace AuctionService.Controllers
 
         // GET: api/Auctions
         [HttpGet]
-        public async Task<ActionResult<List<AuctionDTO>>> GetAllAuctions()
+        public async Task<ActionResult<List<AuctionDTO>>> GetAllAuctions(string date)
         {
-            var auctions = await _context.Auctions
-                .Include(x => x.Item)
-                .OrderBy(x => x.Item.Make)
-                .ToListAsync();
+            var query = _context.Auctions.OrderBy(x => x.Item.Make).AsQueryable();
 
-            foreach (var auction in auctions)
+            if(!string.IsNullOrEmpty(date))
             {
-                System.Console.WriteLine(auction);
+                query = query.Where(x => x.UpdatedAt.CompareTo(DateTime.Parse(date).ToUniversalTime()) > 0);
             }
 
-            return _mapper.Map<List<AuctionDTO>>(auctions);
+            return await query.ProjectTo<AuctionDTO>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
         // GET: api/Auctions/40490065-dac7-46b6-acc4-0000000
