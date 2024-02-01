@@ -5,7 +5,7 @@ using MongoDB.Entities;
 using SearchService;
 using ZstdSharp.Unsafe;
 
-namespace MyApp.Namespace
+namespace SearchService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
